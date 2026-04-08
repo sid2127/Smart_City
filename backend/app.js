@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // app.get('/', (req, res) => {
 //     console.log("Root route hit ✅");
@@ -13,6 +15,7 @@ app.use(express.json());
 
 import user from './src/routes/user.routes.js'
 import complaint from './src/routes/complaint.routes.js'
+
 
 app.use("/api/v1/user" , user);
 app.use("/api/v1/complaint" , complaint);

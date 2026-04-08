@@ -1,4 +1,4 @@
-import {db} from '../db/index.js';
+import { db } from '../db/index.js';
 import bcrypt from 'bcryptjs';
 import { generateAccessToken } from '../utils/jwt.js';
 
@@ -8,7 +8,6 @@ const SignUp = async (req, res) => {
   try {
     const { name, email, password, role, department } = req.body;
 
-    // 🔹 validation
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
@@ -16,7 +15,6 @@ const SignUp = async (req, res) => {
       });
     }
 
-    // 🔹 check existing user
     const [rows] = await db.query(
       "SELECT * FROM users WHERE email = ?",
       [email]
@@ -29,28 +27,31 @@ const SignUp = async (req, res) => {
       });
     }
 
-    // 🔹 hash password
     const hashedPassword = await bcrypt.hash(String(password), 10);
 
-    // 🔹 insert user
     const [result] = await db.query(
       `INSERT INTO users (name, email, password, role, department)
        VALUES (?, ?, ?, ?, ?)`,
       [name, email, hashedPassword, role, department || null]
     );
 
-    // 🔹 generate token (IMPORTANT FIX)
     const token = generateAccessToken({
       id: result.insertId,
-      email: email,
-      name: name,
-      role: role
+      email,
+      name,
+      role
+    });
+
+    // 🔥 SET COOKIE
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: false, // true in production (https)
+      sameSite: "lax"
     });
 
     return res.status(201).json({
       success: true,
       message: "Signup successful",
-      token,
       user: {
         id: result.insertId,
         name,
@@ -63,12 +64,10 @@ const SignUp = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Signup failed",
-      error: error.message
+      message: "Signup failed"
     });
   }
 };
-
 
 
 // ================= LOGIN =================
@@ -76,7 +75,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 🔹 validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -84,7 +82,6 @@ const login = async (req, res) => {
       });
     }
 
-    // 🔹 find user
     const [rows] = await db.query(
       "SELECT * FROM users WHERE email = ?",
       [email]
@@ -99,7 +96,6 @@ const login = async (req, res) => {
 
     const user = rows[0];
 
-    // 🔹 compare password
     const isMatch = await bcrypt.compare(String(password), user.password);
 
     if (!isMatch) {
@@ -109,7 +105,6 @@ const login = async (req, res) => {
       });
     }
 
-    // 🔹 generate token
     const token = generateAccessToken({
       id: user.id,
       email: user.email,
@@ -117,10 +112,16 @@ const login = async (req, res) => {
       role: user.role
     });
 
+    // 🔥 SET COOKIE
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax"
+    });
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      token,
       user: {
         id: user.id,
         name: user.name,
@@ -133,21 +134,22 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Login failed",
-      error: error.message
+      message: "Login failed"
     });
   }
 };
 
 
-
 // ================= LOGOUT =================
 const logout = async (req, res) => {
   try {
-    return res.status(200).json({
+    res.clearCookie("accessToken");
+
+    return res.json({
       success: true,
-      message: "Logout successful (remove token from frontend)"
+      message: "Logout successful"
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
