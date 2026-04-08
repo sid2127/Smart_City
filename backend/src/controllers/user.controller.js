@@ -1,4 +1,4 @@
-import db from '../db/index.js';
+import {db} from '../db/index.js';
 import bcrypt from 'bcryptjs';
 import { generateAccessToken } from '../utils/jwt.js';
 
@@ -30,7 +30,7 @@ const SignUp = async (req, res) => {
     }
 
     // 🔹 hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(String(password), 10);
 
     // 🔹 insert user
     const [result] = await db.query(
@@ -100,7 +100,7 @@ const login = async (req, res) => {
     const user = rows[0];
 
     // 🔹 compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(String(password), user.password);
 
     if (!isMatch) {
       return res.status(400).json({
