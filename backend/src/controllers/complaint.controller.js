@@ -5,6 +5,8 @@ import { UploadOnCloudinary } from '../utils/cloudinary.js';
 //Create Complaint
 const createComplaint = async (req, res) => {
   try {
+
+    console.log("REQ USER:", req.user); 
     const { title, description, department, priority, address } = req.body;
 
     if (!title || !description || !department || !address) {
@@ -21,10 +23,11 @@ const createComplaint = async (req, res) => {
 
     // upload to cloudinary
     if (localFilePath) {
-      const cloudinaryResponse = await UploadOnCloudinary(localFilePath);
-
-      if (cloudinaryResponse) {
-        image_url = cloudinaryResponse.secure_url; // 🔥 IMPORTANT
+      try {
+        const cloudinaryResponse = await UploadOnCloudinary(localFilePath);
+        image_url = cloudinaryResponse?.secure_url;
+      } catch (err) {
+        console.log("Cloudinary error:", err);
       }
     }
 
@@ -357,4 +360,4 @@ const getComplaintById = async (req, res) => {
 };
 
 
-export { getComplaints, createComplaint, assignComplaint, updateComplaintStatus , getOfficersGrouped , deleteComplaint, getComplaintById};
+export { getComplaints, createComplaint, assignComplaint, updateComplaintStatus, getOfficersGrouped, deleteComplaint, getComplaintById };

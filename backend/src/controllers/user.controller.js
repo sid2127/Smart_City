@@ -1,14 +1,30 @@
 import { db } from '../db/index.js';
 import bcrypt from 'bcryptjs';
 import { generateAccessToken } from '../utils/jwt.js';
+import { sentOtp } from '../utils/mail.js';
+
+
+const generatePassword = () => {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
+
+  let password = "";
+
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    password += chars[randomIndex];
+  }
+
+  return password;
+};
 
 
 // ================= SIGNUP =================
 const SignUp = async (req, res) => {
   try {
-    const { name, email, password, role, department } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
@@ -29,10 +45,12 @@ const SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(String(password), 10);
 
+    const role = "user"; // 🔥 FIX
+
     const [result] = await db.query(
       `INSERT INTO users (name, email, password, role, department)
        VALUES (?, ?, ?, ?, ?)`,
-      [name, email, hashedPassword, role, department || null]
+      [name, email, hashedPassword, role, null]
     );
 
     const token = generateAccessToken({
@@ -42,10 +60,9 @@ const SignUp = async (req, res) => {
       role
     });
 
-    // 🔥 SET COOKIE
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: false, // true in production (https)
+      secure: false,
       sameSite: "lax"
     });
 
@@ -56,12 +73,12 @@ const SignUp = async (req, res) => {
         id: result.insertId,
         name,
         email,
-        role,
-        department
+        role
       }
     });
 
   } catch (error) {
+    console.error(error); // 🔥 add this for debugging
     return res.status(500).json({
       success: false,
       message: "Signup failed"
@@ -140,7 +157,7 @@ const login = async (req, res) => {
 };
 
 
-// ================= LOGOUT =================
+// LOGOUT 
 const logout = async (req, res) => {
   try {
     res.clearCookie("accessToken");
@@ -159,4 +176,86 @@ const logout = async (req, res) => {
 };
 
 
-export { SignUp, login, logout };
+const createOfficer = async (req, res) => {
+  try {
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admin can create officers"
+      });
+    }
+
+    const { name, email, department } = req.body;
+
+    if (!name || !email || !department) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields required"
+      });
+    }
+
+    const response = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (response[0].length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists"
+      });
+    }
+
+    const rawPassword = generatePassword();
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+    await db.query(
+      `INSERT INTO users (name, email, password, role, department)
+       VALUES (?, ?, ?, 'officer', ?)`,
+      [name, email, hashedPassword, department]
+    );
+
+    // 🔥 Send Email
+    await sentOtp(email , rawPassword);
+
+    return res.status(201).json({
+      success: true,
+      message: "Officer created and email sent successfully"
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create officer"
+    });
+  }
+};
+
+//getUserDetails
+const getUserDetails = async (req, res) => {
+  try {
+    const user = req.user; // 🔥 from middleware
+
+    return res.status(200).json({
+      success: true,
+      message: "User Data Fetched Successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department
+      }
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to Fetch User"
+    });
+  }
+};
+
+export { SignUp, login, logout, createOfficer , getUserDetails};
