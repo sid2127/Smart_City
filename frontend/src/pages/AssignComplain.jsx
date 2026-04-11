@@ -33,7 +33,7 @@ function ComplaintDetails() {
   const fetchOfficers = async (complaintId) => {
     try {
       const res = await axios.get(
-        `${serverUrl}api/v1/user/getOfficersByComplaint/${complaintId}`,
+        `${serverUrl}/api/v1/user/getOfficersByComplaint/${complaintId}`,
            {withCredentials: true}
       );
 
@@ -53,7 +53,7 @@ function ComplaintDetails() {
       setLoading(true);
 
       const res = await axios.post(
-        `${serverUrl}api/v1/complaint/assignComplaint/${id}/${officerId}`,
+        `${serverUrl}/api/v1/complaint/assignComplaint/${id}/${officerId}`,
         {},
         {withCredentials: true}
       );

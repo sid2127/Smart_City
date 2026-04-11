@@ -15,7 +15,7 @@ function useGetUserDetails() {
 
         const getUser = async () => {
             try {
-                const result = await axios.get(`${serverUrl}api/v1/user/getUserDetails`,
+                const result = await axios.get(`${serverUrl}/api/v1/user/getUserDetails`,
                     { withCredentials: true }
                 )
 

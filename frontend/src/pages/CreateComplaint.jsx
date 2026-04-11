@@ -38,7 +38,7 @@ function CreateComplaint() {
             formData.append("priority", form.priority);
             if (form.image) formData.append("image", form.image);
 
-            await axios.post(`${serverUrl}api/v1/complaint/createComplaint`, 
+            await axios.post(`${serverUrl}/api/v1/complaint/createComplaint`, 
                 formData, 
                 {withCredentials: true});
 

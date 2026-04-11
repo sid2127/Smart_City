@@ -34,7 +34,7 @@ function CreateOfficer() {
       setLoading(true);
 
       const res = await axios.post(
-        `${serverUrl}api/v1/user/createOfficer`,
+        `${serverUrl}/api/v1/user/createOfficer`,
         form,
         { withCredentials: true }
       );

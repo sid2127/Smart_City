@@ -16,7 +16,7 @@ function AllOfficers() {
       const getOfficers = async () => {
         try {
           const res = await axios.get(
-            `${serverUrl}api/v1/user/getAllOfficers`,
+            `${serverUrl}/api/v1/user/getAllOfficers`,
             { withCredentials: true }
           );
 
@@ -34,7 +34,7 @@ function AllOfficers() {
   const deleteOfficer = async (id) => {
     try {
       const res = await axios.delete(
-        `${serverUrl}api/v1/user/removeOfficer/${id}`,
+        `${serverUrl}/api/v1/user/removeOfficer/${id}`,
         { withCredentials: true }
       );
       console.log(res.data);

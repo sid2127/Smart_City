@@ -11,7 +11,7 @@ function OfficerDashboard() {
 
   const updateStatus = async (e, complaintId) => {
     try {
-      const res = await axios.put(`${serverUrl}api/v1/complaint/updateStatus/${complaintId}/${e.target.value}`,
+      const res = await axios.put(`${serverUrl}/api/v1/complaint/updateStatus/${complaintId}/${e.target.value}`,
         {},
         {withCredentials: true}
       )

@@ -16,7 +16,7 @@ function useGetAllComplaints() {
 
         const getComplaints = async ()=> {
             try {
-                const result = await axios.get(`${serverUrl}api/v1/complaint/getAllComplaints`,
+                const result = await axios.get(`${serverUrl}/api/v1/complaint/getAllComplaints`,
                     {withCredentials: true}
                 )
 

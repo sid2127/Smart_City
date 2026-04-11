@@ -31,7 +31,7 @@ function Login() {
         setLoading(true);
 
         try {
-            const result = await axios.post(`${serverUrl}api/v1/user/login`,
+            const result = await axios.post(`${serverUrl}/api/v1/user/login`,
                 form,
                 {withCredentials: true}
             );
