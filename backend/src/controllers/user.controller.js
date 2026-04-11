@@ -62,8 +62,8 @@ const SignUp = async (req, res) => {
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: true,
+      sameSite: "none"
     });
 
     return res.status(201).json({
@@ -132,8 +132,8 @@ const login = async (req, res) => {
     // 🔥 SET COOKIE
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: true,
+      sameSite: "none"
     });
 
     return res.status(200).json({
