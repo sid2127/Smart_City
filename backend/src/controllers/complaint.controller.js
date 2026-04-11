@@ -6,8 +6,10 @@ import { UploadOnCloudinary } from '../utils/cloudinary.js';
 const createComplaint = async (req, res) => {
   try {
 
-    console.log("REQ USER:", req.user); 
-    const { title, description, department, priority, address } = req.body;
+    console.log("REQ USER:", req.user);
+    const { title, description, address } = req.body;
+    const department = req.body.department?.toLowerCase() || "";
+    const priority = req.body.priority?.toLowerCase() || "medium";
 
     if (!title || !description || !department || !address) {
       return res.status(400).json({
@@ -159,11 +161,25 @@ const assignComplaint = async (req, res) => {
       });
     }
 
+    const response1 = await db.query(
+      `SELECT * FROM complaints WHERE id = ? AND status ='pending'`,
+      [complaintId]
+    )
+
+    const complaint = response1[0];
+
+    if (complaint.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Complaint already assigned or not in pending state"
+      });
+    }
+
     // 🔹 assign officer + change status
     const response = await db.query(
       `UPDATE complaints 
-       SET assigned_to = ?, status = 'assigned'
-       WHERE id = ?`,
+   SET assigned_to = ?, status = 'assigned'
+   WHERE id = ? AND status = 'pending'`,
       [officerId, complaintId]
     );
 
@@ -193,7 +209,8 @@ const assignComplaint = async (req, res) => {
 //Update Status of Complaint
 const updateComplaintStatus = async (req, res) => {
   try {
-    const { complaintId, status } = req.params;
+    let { complaintId, status } = req.params;
+
 
     if (!complaintId || !status) {
       return res.status(400).json({
@@ -201,6 +218,8 @@ const updateComplaintStatus = async (req, res) => {
         message: "ComplaintId and status required"
       });
     }
+
+    status = status.toLowerCase();
 
     const response = await db.query(
       `UPDATE complaints 

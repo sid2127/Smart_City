@@ -25,7 +25,13 @@ const userSlice = createSlice({
         },
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
+        },
+        updateStatus: (state , action) => {
+            const {id, status} = action.payload;
+
+            state.complaints = state.complaints.map((c) => c.id === Number(id) ? (c.status = {status}) : c );
         }
+
     }
 });
 

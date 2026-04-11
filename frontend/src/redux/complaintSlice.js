@@ -19,10 +19,14 @@ const complaintSlice = createSlice({
         },
         setPendingComplaints: (state, action) => {
             state.pendingComplaints = action.payload;
+        },
+        removePendingComplaint: (state , action) => {
+            const id = action.payload;
+            state.pendingComplaints = state.pendingComplaints.filter(c => c.id !== id);
         }
 
     }
 })
 
-export const { setAssignedComplaints, setCompletedComplaints, setPendingComplaints } = complaintSlice.actions;
+export const { setAssignedComplaints, setCompletedComplaints, setPendingComplaints, removePendingComplaint } = complaintSlice.actions;
 export default complaintSlice.reducer;

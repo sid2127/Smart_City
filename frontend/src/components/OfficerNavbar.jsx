@@ -37,8 +37,8 @@ function Navbar() {
 
             {/* Center */}
             <div className="flex gap-6">
-                <Link to="/user" className="hover:underline">All Complaints</Link>
-                <Link to="/create-complaint" className="hover:underline">Create Complaint</Link>
+                <Link to="/officer" className="hover:underline">Pending Complaints</Link>
+                <Link to="/officer/completed" className="hover:underline">Completed Complaints</Link>
             </div>
 
             {/* Right */}

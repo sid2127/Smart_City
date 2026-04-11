@@ -258,4 +258,98 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-export { SignUp, login, logout, createOfficer , getUserDetails};
+//getOfficersById
+
+const getOfficersByComplaint = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log(id);
+    
+
+    const [officers] = await db.query(
+      `SELECT 
+        u.id,
+        u.name,
+        u.email,
+        COUNT(c.id) AS activeComplaints
+      FROM users u
+      LEFT JOIN complaints c 
+        ON u.id = c.assigned_to 
+        AND c.status != 'resolved'
+      WHERE u.role = 'officer'
+      AND u.department = (
+        SELECT department 
+        FROM complaints 
+        WHERE id = ?
+      )
+      GROUP BY u.id`,
+      [id]
+    );
+
+    res.status(200).json({
+      success: true,
+      officers,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+//getAllOfficers
+const getAllOfficers = async (req , res) => {
+  try {
+    const [officers] = await db.query(
+      `Select id , name , email , department from users where role = 'officer'`
+    );
+
+
+    res.status(200).json({
+      success: true,
+      officers,
+    });
+  } catch (error) {
+    console.log("Error while fetching all officers" , error);
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching all officers"
+    });
+  }
+}
+
+const removeOfficer = async(req , res) => {
+  try {
+    const {id} = req.params;
+
+    if(!id){
+      return res.status(400).json({
+        success: false,
+        message: "Officer ID is required"
+      });
+    }
+
+    const [result] = await db.query(
+      "DELETE FROM users WHERE id = ? AND role = 'officer'",
+      [id]
+    );
+
+    if(result.affectedRows === 0){
+      return res.status(404).json({
+        success: false,
+        message: "Officer not found or cannot be deleted"
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete officer"
+    });
+  }
+}
+
+export { SignUp, login, logout, createOfficer , getUserDetails , getOfficersByComplaint , getAllOfficers , removeOfficer};

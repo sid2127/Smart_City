@@ -1,21 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
 
-
 const AdminNavbar = () => {
   const { pathname } = useLocation();
 
   const menuItems = [
-    { name: "Dashboard", path: "/dashboard", icon: "📊" },
-    { name: "Pending Complaints", path: "/", icon: "📥" },
-    { name: "All Complaints", path: "/complaints", icon: "📋" },
-    { name: "Officers", path: "/officers", icon: "👨‍💼" },
-    { name: "Add Officer", path: "/create-officer", icon: "➕" },
+    { name: "Pending Complaints", path: "/admin", icon: "📥" },   // DEFAULT PAGE
+    { name: "Dashboard", path: "/admin/dashboard", icon: "📊" },
+    { name: "Assigned Complaints", path: "/admin/assigned-complaints", icon: "📋" },
+    { name: "Officers", path: "/admin/officers", icon: "👨‍💼" },
+    { name: "Add Officer", path: "/admin/create-officer", icon: "➕" },
   ];
 
   return (
     <div className="flex flex-col justify-between w-64 h-screen bg-gray-900 text-white p-5">
-
-      {/* Top Section */}
+      
+      {/* Top */}
       <div>
         <h1 className="text-2xl font-bold mb-8 text-center">
           Admin Panel
@@ -40,18 +39,15 @@ const AdminNavbar = () => {
         </ul>
       </div>
 
-      {/* Bottom Section (Logout) */}
-      <div>
-        <button
-          onClick={() => {
-            // Handle logout logic here
-
-          }}
-          className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
-      </div>
+      {/* Bottom */}
+      <button
+        onClick={() => {
+          // TODO: logout logic
+        }}
+        className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-600 transition"
+      >
+        🚪 Logout
+      </button>
     </div>
   );
 };

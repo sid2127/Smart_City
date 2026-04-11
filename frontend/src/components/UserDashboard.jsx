@@ -24,6 +24,7 @@ function UserDashboard() {
 
                                 {/* LEFT: TEXT */}
                                 <div className="flex-1">
+                                    <h1> <span className=' font-bold'>#Complaint Id : </span>{complaint.id}</h1>
                                     <h2 className="text-lg font-semibold">
                                         {complaint.title}
                                     </h2>
@@ -56,7 +57,7 @@ function UserDashboard() {
 
                                 {/* RIGHT: IMAGE */}
                                 {complaint.image_url && (
-                                    <div className="w-40 h-32 flex-shrink-0">
+                                    <div className="w-40 h-32 shrink-0">
                                         <img
                                             src={complaint.image_url}
                                             alt="complaint"
