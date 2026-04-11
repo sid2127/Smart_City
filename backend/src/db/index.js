@@ -1,26 +1,18 @@
 import mysql from "mysql2/promise";
 
-// 🔹 Create pool
-const db = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: process.env.MYSQL_PASSWORD,
-    database: "smartCity",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+// 🔹 Create pool using Railway URL
+const db = mysql.createPool(process.env.MYSQL_URL);
 
 // 🔹 Test DB connection
 const connectdb = async () => {
-    try {
-        const connection = await db.getConnection();
-        console.log("MySQL Connected ✅");
-        connection.release(); // important
-    } catch (error) {
-        console.error("MySQL Connection Failed ❌", error.message);
-        process.exit(1);
-    }
+  try {
+    const connection = await db.getConnection();
+    console.log("MySQL Connected ✅");
+    connection.release();
+  } catch (error) {
+    console.error("MySQL Connection Failed ❌", error.message);
+    process.exit(1);
+  }
 };
 
 export { db, connectdb };
